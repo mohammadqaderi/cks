@@ -1,0 +1,37 @@
+- The Kubelet configuration is exists in Kubernetes resource called KubeletConfiguration
+in a file path called kubelet-config in /var/lib/kubelet/kubelet-config.yaml
+
+- In Kubelet service, it points to kubelet-config file using config parameter
+
+- Kubelet serves on two ports:
+  - 10250: Serves API that allow full access
+  - 10255: Serves API that allow unauthenticated read-only access
+
+- curl -sk https://localhost:10250/pods/
+  - list pods in the node
+
+- curl -sk https://localhost:10255/metrics/
+  - show detailed information about the node metrics (but anyone knows the IP of that node can see this information
+  and this is a big risk)
+
+- The best practice is to disable the anonymous authentication in the kubelet configuration and enable one of
+the authentication mechanisms.
+
+- Kubelet Authentication Mechanisms:
+ - Certificate Based Authentication
+   - We'll have a ca.crt file that we'll provide it in the kubelet service configuration in a parameter called
+    --ca-client-file
+   - You can set this file in kubelet configuration file in the following property:
+       authentication:
+         x509:
+           clientCAFile: ca.crt
+   - When you call the kubelet endpoint, you've to provide the ca file in the request:
+     curl -sk https://localhost:10250/pods/ --key kubelet-key.pem --cert kubelet-cert.pem
+ - API Bearer Tokens
+
+- Kubelet Authorization
+ - The default authorization mode in the kubelet config is AlwaysAllow
+ - To prevent this, change the authorization mode to Webhook
+ - Regarding the 10255 port access, it depends on a key called read-only-port in kubelet service configuration
+   - if it set to 0, then it's disabled
+   - This key is exists in kubelet config file called readOnlyPort

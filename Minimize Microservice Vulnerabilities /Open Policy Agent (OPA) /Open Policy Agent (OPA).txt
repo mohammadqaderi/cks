@@ -1,0 +1,23 @@
+- OPA is an authorization mechanism for authorizing specific APIs using a language called rego
+
+- It listens on port 8181 by default
+
+- Authentication and authorization are disabled by default in OPA.
+
+- Installation:
+  - curl -L -o opa https://github.com/open-policy-agent/opa/releases/download/v0.38.1/opa_linux_amd64
+  - chmod 755 ./opa
+  - ./opa run -s &
+
+
+- Question: Load policy /root/sample.rego to OPA with the name samplepolicy.
+Solution: Make a PUT API call to /v1/policies/
+curl -X PUT --data-binary @sample.rego http://localhost:8181/v1/policies/samplepolicy
+
+
+Reference links
+- How Netflix Is Solving Authorization Across Their Cloud [I] – Manish Mehta & Torin Sandall, Netflix
+https://www.youtube.com/watch?v=R6tUNpRpdnY
+
+- OPA Deep Dive
+https://www.youtube.com/watch?v=4mBJSIhs2xQ

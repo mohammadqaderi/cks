@@ -1,0 +1,23 @@
+- When image is built from scratch it then a base image.
+
+- Slim/Minimal Images
+  - Create slim/minimal images
+  - Find an official minimal image that exists
+  - Only install necessary packages:
+    - Remove Shells/Package Manager/Tools
+  - Maintain different images for different
+    environments:
+    - Development - Debug tools
+    - Production - lean
+  - Use multi-stage builds to create lean production ready images.
+
+- Dirstroless Docker Images
+  - Contains:
+    - Application
+    - Runtime Dependencies
+  - Does not contain:
+    - Package Managers
+    - Shells
+    - Network Tools
+    - Text Editor
+    - Other unwanted programs

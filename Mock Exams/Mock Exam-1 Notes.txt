@@ -1,0 +1,76 @@
+Question-1
+- For the service account with the least privileges, you can check the bounded roles for each service account
+in order to use it in the pod
+- Load the apparmor profile using the following command:
+  apparmor_parser -q /etc/apparmor.d/frontend
+  - if it was a script, you can load it like this:
+    apparmor_parser /etc/apparmor.d/frontend.sh
+------------------------------------------------------------------------------------------------
+
+Question-4
+- For the seccomp profiles, you can put them in the following directory:
+  /var/lib/kubelet/seccomp/profiles
+
+- Add the seccomp profile under the pod spec or the containers field like this:
+securityContext:
+    seccompProfile:
+      type: Localhost
+      localhostProfile: profiles/audit.json
+-------------------------------------------------------------------------------------------------
+
+Question-6
+- If you asked to put the falco logs in a specific location, edit the falco configuration under
+  /etc/falco/falco.yaml and edit the file_output property
+file_output:
+  enabled: true
+  keep_alive: false
+  filename: <LOCATION>
+
+- Update the falco local rules under /etc/falco/falco_rules.local.yaml and add your own custom rule:
+- rule: Write below binary dir
+  desc: an attempt to write to any file below a set of binary directories
+  condition: >
+    bin_dir and evt.dir = < and open_write
+    and not package_mgmt_procs
+    and not exe_running_docker_save
+    and not python_running_get_pip
+    and not python_running_ms_oms
+    and not user_known_write_below_binary_dir_activities
+  output: >
+    File below a known binary directory opened for writing (user_id=%user.uid file_updated=%fd.name command=%proc.cmdline)
+  priority: CRITICAL
+  tags: [filesystem, mitre_persistence]
+
+- Regarding the output in the falco rule, you can use the following resources to edit the output:
+ - https://falco.org/docs/reference/rules/default-macros/
+ - https://falco.org/docs/reference/rules/supported-fields/
+
+- To restart the falco service with Hot reload: kill -1 $(cat /var/run/falco.pid)
+-------------------------------------------------------------------------------------------------
+
+Question-7
+- To edit the pod runtime class, add the following field in the pod spec:
+  runtimeClassName: gvisor
+-------------------------------------------------------------------------------------------------
+
+Question-8
+- To create a new admission configuration file at /root/CKS/ImagePolicy/admission-configuration.yaml
+  and use the following sample:
+apiVersion: apiserver.config.k8s.io/v1
+kind: AdmissionConfiguration
+plugins:
+- name: ImagePolicyWebhook
+  configuration:
+    imagePolicy:
+      kubeConfigFile: /etc/admission-controllers/admission-kubeconfig.yaml
+      allowTTL: 50
+      denyTTL: 50
+      retryBackoff: 500
+      defaultAllow: false
+
+- Update the kube-apiserver command flags and add ImagePolicyWebhook to the enable-admission-plugins flag
+    - --admission-control-config-file=/etc/admission-controllers/admission-configuration.yaml
+    - --enable-admission-plugins=NodeRestriction,ImagePolicyWebhook
+
+
+

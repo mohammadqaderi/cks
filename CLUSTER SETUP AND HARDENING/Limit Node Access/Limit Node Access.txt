@@ -1,0 +1,45 @@
+- Allow connection from IP range, and block connection from another IP range
+
+- Deploy the cluster in a private network
+
+- Types of accounts:
+  - User Account (bob, john, charlie)
+  - Superuser Account -> root user
+  - System Accounts -> ssh, mail
+  - Service Accounts -> nginx, http
+
+- The id command show the user in the node
+
+- The who command show the logged-in users in the node
+
+- The last command lists the last time users were logged-in in the node
+
+- Access Control Files
+  - /etc/passwd contains basic information about the users in the system (does not save any passwords)
+  - /etc/shadow contains password of the users hashed
+  - /etc/group contains stores information about all the users groups in the system
+
+- We can disable the user account by updating the default shell fo the user to a nologin shell like this:
+  usermod -s /bin/nologin michel
+- Or we can delete the user account using userdel command:
+  userdel michel
+
+- Delete user account from unwanted group:
+  deluser michel admin
+
+
+- To set a new password for a user, use the following command:
+  sudo passwd USERNAME
+
+- To delete a user group use the following command:
+  groupdel GROUP_NAME
+
+- To set the user group, use the usermod command:
+  usermod USERNAME -G admin
+
+- Example:
+Create a user named sam on the controlplane host. The user's home directory must be /opt/sam.
+Login shell must be /bin/bash and uid must be 2328. Make sam a member of the admin group.
+
+useradd sam -G admin -u 2328 -s /bin/bash -d /opt/sam
+

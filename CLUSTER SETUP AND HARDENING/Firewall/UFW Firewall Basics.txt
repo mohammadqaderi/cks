@@ -1,0 +1,49 @@
+- UFW (Uncomplicated Firewall)
+
+- To close all other ports in a web server and keep ports open like 22-ssh, 80-http we can use of a tool for blocking
+  the inbound access using a tool of the internal packet filtering system called Net Filter.
+
+- IP Tables is the most common tools that used to configure the Linux firewall.
+
+- UFW is a simple frontend interface for IP Tables.
+
+- Installing UWF
+  - apt-get update
+  - apt-get install ufw
+  - systemctl enable ufw
+  - systemctl start ufw
+
+
+- UFW Default Rules
+
+  - Enable outgoing connections: ufw default allow outgoing
+  - Deny all inbound connections: ufw default deny incoming
+
+- Adding custom rules:
+  - Allow http connection from ip 172.16.238.5 with protocol TCP
+    ufw allow from 172.16.238.5 to any port 22 proto tcp
+
+  - Allow ssh connection from ip 172.16.238.5 with protocol TCP
+    ufw allow from 172.16.238.5 to any port 80 proto tcp
+
+  - Deny port 8080 for all hosts:
+    ufw deny 8080
+
+- Enable the firewall
+  - After adding default and custom rules, this will not affect the server.
+  - Enable the firewall to see the changes: ufw enable
+  - Run ufw status to see the added rules
+
+- Delete UFW Rules
+  - Use ufw delete <RULE_NAME>
+  - ufw delete deny 8080
+  - You can delete rule by passing its line number after executing the ufw status (ufw delete 2)
+
+
+- Lab Questions:
+- What is the command to allow a tcp port range between 1000 and 2000 in ufw?
+  ufw allow 1000:2000/tcp
+
+- There is a Lighttpd service running on the node01. Identify which port it is bound to.
+  - Find the service: systemctl status lighttpd
+  - Find its port using netstat: netstat -natulp | grep -i Lighttpd

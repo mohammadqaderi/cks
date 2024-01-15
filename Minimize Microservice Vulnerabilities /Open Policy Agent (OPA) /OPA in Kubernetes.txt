@@ -1,0 +1,36 @@
+- Kube Management is a service deployed as sidecar container that runs in the OPA server that used to replicate
+  resources definitions from kubernetes, so they can be cached in OPA
+
+- It's also used to load policies into OPA by simply creating a configmap in kubernetes as opposed to
+  loading the policies directly on OPA
+  kubectl create configmap configmap_name --from-file=opa-policy.rego
+
+
+- OPA Gatekeeper in Kubernetes
+  - The "Open Policy Agent Gatekeeper" can be leveraged to help enforce policies and strengthen governance
+    in your Kubernetes environment.
+  - With OPA Gatekeeper, you can best practices and organizational conventions for your resources in your kubernetes cluster.
+  - For example, you can enforce policies like:
+     - All namespaces must have a label that lists a point-of-contact
+     - All images must be from approved repositories
+     - All pods must have resource limits
+  - Installation:
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper/v3.14.0/deploy/gatekeeper.yaml
+
+  - Docs: https://open-policy-agent.github.io/gatekeeper/website/docs/howto
+
+  - Constraint Example:
+    apiVersion: constraints.gatekeeper.sh/v1beta1
+    kind: K8sRequiredLabels
+    metadata:
+      name: require-tech-label
+    spec:
+      match:
+        namespaces: ["engineering"]
+      parameters:
+        labels: ["tech"]
+
+  - We've an example that describes the following in opa-replica-constraint-template.yaml:
+    - Create an GateKeeper ConstraintTemplate k8sreplicalimits for this policy
+    - Create a Constraint named replica-limits that uses created template CRD to enforce constraints
+      on replicas, setting limits within the range of 2 to 5.

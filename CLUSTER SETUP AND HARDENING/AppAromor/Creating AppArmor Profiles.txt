@@ -1,0 +1,18 @@
+- Instead of creating AppArmor profile manually, we can use the AppArmor utilities
+
+- Install AppArmor utility:
+  apt-get install -y apparmor-utils
+
+- Using aa-genprof command:
+  aa-genprof /root/add_data.sh
+
+- After finishing the AppArmor script questions, the new AppArmor profile will be stored in this location:
+  /etc/apparmor.d/root.add_data.sh
+
+- To load AppArmor profile, use the following command:
+  apparmor_parser /etc/apparmor.d/root.add_data.sh
+
+- To disable AppArmor profile, use the following command:
+  apparmor_parser -R /etc/apparmor.d/root.add_data.sh
+- Then create the same line to the profile inside:
+  ln -s /etc/apparmor.d/root.add_data.sh /etc/apparmor.d/disable/

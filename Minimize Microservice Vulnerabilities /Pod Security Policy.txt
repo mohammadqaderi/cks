@@ -1,0 +1,14 @@
+- To enable Pod Security at the namespace level, you need to add pod security labels
+ to the namespace using the following format:
+pod-security.kubernetes.io/<MODE>: <LEVEL>
+
+- Pod security standards:
+  - Baseline
+  - Privileged
+  - Restricted
+
+
+- The cluster administrator specify the configuration file path for the admission configuration resource
+  in the API server via --admission-control-flag
+Check the following article:
+https://kodekloud.com/topic/understanding-podsecuritypolicy/

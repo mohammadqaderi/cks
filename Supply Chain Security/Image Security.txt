@@ -1,0 +1,18 @@
+- The image property in pod definition consists of:
+  - Registry
+  - User or Library
+  - Image/Repository
+
+- Example (If we didn't specify any custom registry or user account): nginx -> docker.io/library/nginx
+
+- Private Registry
+  - Login: docker login private-registry.io
+  - docker run private-registry.io/apps/internal-app
+  - You can use this image in the pod definition file.
+  - The pod will fail to pull the image from that repository, for that we've to create a secret
+    of type docker-registry
+    - kubectl create secret docker-registry regcred --docker-server=<docker-server> --docker-username=<docker-username>
+      --docker-password=<docker-password> --docker-email=<docker-email>
+    - Add "imagePullSecrets" in the pod spec definition file of type array:
+      imagePullSecrets:
+      - name: regcred

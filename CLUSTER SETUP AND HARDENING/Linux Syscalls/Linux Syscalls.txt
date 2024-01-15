@@ -1,0 +1,31 @@
+- The kernel is divided into two areas:
+  - Kernel space
+    - Kernel Code, Extensions, and Device Drivers are running inside the kernel
+  - User space
+    - Applications like C, Java, C++ are running inside the user space
+
+- If you want a file, say for example (touch /tmp/error.log)
+  - It'll make several system calls
+  - One of them is execve system call that executes the touch binary
+  - A few other calls are:
+    - open()
+    - close()
+    - execve()
+    - readdir()
+    - strlen()
+    - closedir()
+
+
+- Tracing SYSCALLS
+  - which strace -> /usr/bin/strace
+  - it's useful to trace the system calls used by an application
+  - Example: strace touch /tmp/error.log
+  - The 23 vars that comes from the output is implies that 23 variables were inherited by the system call
+    - We can verify this by checking the number of environment variables defined in the user shell
+      by running the env command like this: env | wc -l
+
+  - To trace the syscalls used by a running process we first need to determine the process id
+  - Example: pidof etcd -> 3569
+             strace -p 3569 -> return all the future syscalls made by etcd.
+
+  - To see all the syscalls used by a command, use the strace -c touch /tmp/error.log

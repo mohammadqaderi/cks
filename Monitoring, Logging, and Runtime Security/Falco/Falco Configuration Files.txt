@@ -1,0 +1,44 @@
+- The main falco configuration file is located at /etc/falco/falco.yaml
+
+- The falco configuration file contains:
+  - rules_file field which accepts a list of files paths containing rules
+    * rules_file:
+      - /etc/falco/falco_rules.yaml
+      - /etc/falco/falco_rules.local.yaml
+      - /etc/falco/k8s_audit_rules.yaml
+      - /etc/falco/rules.d
+    - the order for these files is important, if the same rule is declared in all of these files, the one and
+      the last file overrides those in the proceeding files
+
+  - json_output: when enabled, logs the output in json format (by default this field is set to false and the events
+    are logged in text)
+
+  - log_stderr: true (Configuration falco itself)
+  - log_syslog: true (Configuration falco itself)
+  - log_level: info (Configuration falco itself)
+  - priority: debug (Related to falco rules)
+
+  - std_output: (To log output to standard output)
+      enabled: true
+  - file_output: (To log output to text file)
+      enabled: true
+      filename: /opt/falco/events.txt
+  - program_output: (To log output to slack webhook)
+      enabled: true
+      program: "jq '{text: .output} | curl -d @- -X Post https://hooks.slack.com/services/xxx"
+  - http_output: (To log output to a specific http endpoint)
+      enabled: true
+      url: http://some.url/some/path/
+
+
+- In case you want to change anything in the falco configuration file, you've to reload the falco service
+
+- Any change to falco rule inside /etc/falco/falco_rules.yaml file would be tedious, because whenever you made
+  an update to the falco package this rule will be reset to the original one.
+  - The best practice is to add the changed rule to the falco_rules.local.yaml file.
+  - Also, you can add your own custom rules in this file.
+
+- Reload falco service after changes:
+  - Using Hot Reload method:
+    - Find the process id of falco: ps -ef | grep falco or cat /var/run/falco.pid
+    - Run the Signal Hangup: kill -1 $(cat /var/run/falco.pid)

@@ -1,0 +1,23 @@
+- The kernel processes are divided into two processes:
+  - Privileged Processes
+    - Run by the root user with gid of 0
+    - The kernel describe this by the following capabilities (There are more than these capabilities):
+      - CAP_CHOWN: allows making user and group ownership changes to a file.
+      - CAP_NET_ADMIN: allows various network-related operations such as network configurations,
+        modify routing tables, bind processes to an address, etc...
+      - CAP_SYS_BOOT: allows the processes to reboot the system
+      - CAP_SYS_TIME: allows the setting and adjusting the system clock
+  - Unprivileged Processes
+    - Run by any other user with gid is nonzero
+
+- To check which capabilities the command needs, use the following command:
+  getcap /usr/bin/ping
+
+- To check which capabilities the process needs, use the following command:
+  - Find the pid of the process: ps -ef | grep /usr/bin/sshd | grep -v grep
+  - getpcaps 779
+
+- When we run a kubernetes pod with Docker as runtime, containers are only started with 14 capabilities by default
+
+- Under the pod manifest, in the containers section, we can use of securityContext capabilities (add, drop)
+  all of these properties are array type

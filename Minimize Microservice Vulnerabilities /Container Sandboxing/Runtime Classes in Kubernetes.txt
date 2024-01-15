@@ -1,0 +1,28 @@
+- When we use gVisor runsc runtime as a RuntimeClass object resource, the runtime isolate the container processes
+from the host.
+
+- Say for example you create nginx pod specifying the runtime class with runsc, if you want to find the nginx process
+in the host like this: pgrep -a nginx -> you won't find it, but it if pgrep -a runsc -> you will find it
+
+- To check the default runtime in kubernetes cluster, check this folder:
+  cd /var/run/containerd
+
+Example of RuntimeClass object:
+# RuntimeClass is defined in the node.k8s.io API group
+apiVersion: node.k8s.io/v1
+kind: RuntimeClass
+metadata:
+  # The name the RuntimeClass will be referenced by.
+  # RuntimeClass is a non-namespaced resource.
+  name: myclass
+# The name of the corresponding CRI configuration
+handler: myconfiguration
+
+
+Usage in the pod:
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod
+spec:
+  runtimeClassName: myclass

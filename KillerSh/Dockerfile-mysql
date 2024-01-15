@@ -1,0 +1,21 @@
+# /opt/course/22/files/Dockerfile-mysql
+FROM ubuntu
+
+# Add MySQL configuration
+COPY my.cnf /etc/mysql/conf.d/my.cnf
+COPY mysqld_charset.cnf /etc/mysql/conf.d/mysqld_charset.cnf
+
+RUN apt-get update && \
+    apt-get -yq install mysql-server-5.6 &&
+
+# Add MySQL scripts
+COPY import_sql.sh /import_sql.sh
+COPY run.sh /run.sh
+
+# Configure credentials
+COPY secret-token .                                       # LAYER X
+RUN /etc/register.sh ./secret-token                       # LAYER Y
+RUN rm ./secret-token # delete secret token again         # LATER Z
+
+EXPOSE 3306
+CMD ["/run.sh"]

@@ -1,0 +1,27 @@
+- Since we disable the root access ssh for the remote server, there are times when we need to execute
+  a superuser commands
+
+- We can use sudo
+
+- The default configuration for sudo is defined under the /etc/sudoers file
+- This file can be updated using the visudo command
+
+- We can eliminate the need for ever having to login as a root user directly using the following command:
+  grep -I ^root /etc/passwd
+
+Example:
+Create a user named jim on node01 host and configure password-less ssh access from controlplane host
+(from user root) to node01 host (to user jim).
+
+Solution:
+ssh into node01 host from controlplane host
+ssh node01
+
+Create user jim on node01 host
+adduser jim (set any password you like)
+
+Return back to controlplane host and copy ssh public key
+ssh-copy-id -i ~/.ssh/id_rsa.pub jim@node01
+
+Test ssh access from controlplane host
+ssh jim@node0

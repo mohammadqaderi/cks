@@ -1,0 +1,14 @@
+- Prerequisites for AppArmor to run in a kubernetes pod container:
+  - Kubernetes Version > 1.4
+  - AppArmor Kernel module enabled
+  - AppArmor profile loaded in the kernel
+  - Container Runtime should be supported
+
+- Run aa-status in all the worker nodes to check if AppArmor profile is loaded
+
+- We can add AppArmor profile per pod container as annotation:
+  - Under annotations add:
+   container.apparmor.security.beta.kubernetes.io/<container-name>: localhost/<profile-name>
+   Ex: container.apparmor.security.beta.kubernetes.io/ubuntu-sleeper: localhost/apparmor_deny_write
+  - Try to write file: kubectl exec -it ubuntu-sleeper -- touch /tmp/test
+    - This command will fail

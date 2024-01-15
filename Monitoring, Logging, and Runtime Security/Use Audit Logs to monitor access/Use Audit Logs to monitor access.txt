@@ -1,0 +1,93 @@
+- Kubernetes provides auditing by default, and it's handled by the kube-apiserver.
+
+- When a request is made to create a pod it goes to the kube-apiserver, and it goes in different stages:
+  - RequestReceived Stage: events are generated, irrespective of whether the request valid or not.
+  - ResponseStarted Stage
+  - ResponseComplete Stage
+  - Panic Stage: when an error is encountered
+
+- To create policy that will record the events based on a specific condition, we've to create audit policy object.
+- Content of the policy object is:
+apiVersion: audit.k8s.io/v1
+kind: Policy
+omitStages: ["RequestReceived"] (optional field)
+rules:
+- namespaces: ["prod-namespace"] (optional field)
+  verbs: ["delete"] (optional field)
+  resources:
+  - groups: ""
+    resources: ["pods"]
+    resourceNames: ["webapp-pod"] (optional)
+  level: None (Can handle values like Metadata, Request, RequestResponse, None)
+
+
+- To enable audit logs in the kube-apiserver, we've to configure an audit backend.
+- Two types of backend are supported:
+  - A log backend that stores audit events to a file on the master node.
+  - A webhook backend that writes to a remote webhook such as Falco service.
+
+- Update the kube-apiserver pod definition file by adding the following flags:
+  - --audit-log-path=/var/log/k8s-audit.log
+  - --audit-policy-file=/etc/kubernetes/audit-policy.yaml
+
+- To specify the maximum days to keep the audit records, we can make use of the audit-log-maxage flag:
+  - --audit-log-maxage=10 (10 days)
+
+- For preserving space, we can specify the maximum number of these audit files to be retained on the host, by
+  making use of the audit-log-maxbackup flag:
+  - --audit-log-maxbackup=5
+
+- To specify the maximum size in megabytes the audit file can grow to before being rotated, we can make use of
+  audit-log-maxsize flag:
+  - --audit-log-maxsize=100
+
+
+- Example of adding custom audit log file and enable auditing in kube-apiserver:
+enable auditing in this Kubernetes cluster. Create a new policy file and set it to Metadata level,
+and it will only log events based on the below specifications:
+Namespace: prod
+Operations: delete
+Resources: secrets
+Log Path: /var/log/prod-secrets.log
+Audit file location: /etc/kubernetes/prod-audit.yaml
+Maximum days to keep the logs: 30
+
+Once the policy is created it, enable and make sure that it works.
+
+Solution:
+- Create a new policy file at /etc/kubernetes/prod-audit.yaml
+apiVersion: audit.k8s.io/v1
+kind: Policy
+rules:
+- level: Metadata
+  namespaces: ["prod"]
+  verbs: ["delete"]
+  resources:
+  - group: ""
+    resources: ["secrets"]
+
+- Edit the kube-apiserver manifest file:
+  - Add the following flags:
+     - --audit-policy-file=/etc/kubernetes/prod-audit.yaml
+     - --audit-log-path=/var/log/prod-secrets.log
+     - --audit-log-maxage=30
+  - Add the volumes and volume mounts:
+    Volumes:
+      - name: audit
+        hostPath:
+          path: /etc/kubernetes/prod-audit.yaml
+          type: File
+
+      - name: audit-log
+        hostPath:
+          path: /var/log/prod-secrets.log
+          type: FileOrCreate
+    Volume Mounts:
+      - mountPath: /etc/kubernetes/prod-audit.yaml
+        name: audit
+        readOnly: true
+      - mountPath: /var/log/prod-secrets.log
+        name: audit-log
+        readOnly: false
+
+Wait for the kube-apiserver pod to be restarted and reflect the changes

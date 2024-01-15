@@ -1,0 +1,21 @@
+- gVisor is a sandbox tool
+
+- The aim of gVisor is to have additional layer of security between the container and the operating system kernel
+
+- gVisor is a tool from Google that allows an additional layer of isolation between the container and the kernel.
+
+- gVisor sandbox consists of two major components that work together to achieve stronger isolation when compared
+  to traditional containers:
+  1. Sentry
+     - independent application-level kernel which is dedicated for containers.
+     - The main purpose of Sentry is to intercept and respond to system calls which are made by containerized
+       applications.
+     - It supports far fewer functionality than the actual linux kernel.
+  2. Gofer
+    - if the application needs access to a file, Sentry cannot make the access system call directly
+      to the linux kernel, Instead, Sentry talks to a dedicated process called Gofer (Gofer is a file proxy that
+      implements the logic that is needed for the containerized apps to access the system files).
+      This is like a middleman which is sitting between the container and the operating system.
+
+- Each containerized environment has its own dedicated gVisor kernel (This means that each container would now
+  be isolated it its own virtualized sandbox which reduces the attack surface)

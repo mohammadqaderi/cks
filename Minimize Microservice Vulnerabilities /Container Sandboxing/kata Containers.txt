@@ -1,0 +1,8 @@
+- Kata Containers is a sandbox tool
+
+- Kata installs each container into its own separate virtual machine, and each container will have its own
+  dedicated kernel running inside.
+
+- The virtual machines created by kata are lightweight and more focused on performance.
+
+- kata uses nested virtualization (vm inside vm) and that's not supported by many cloud providers

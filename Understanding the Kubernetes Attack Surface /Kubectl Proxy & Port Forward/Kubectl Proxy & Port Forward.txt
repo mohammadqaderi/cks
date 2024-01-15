@@ -1,0 +1,14 @@
+- kubectl proxy lunches a proxy service locally on port 8001 by default
+
+- it uses the credentials and certificates from your kube config file
+
+- This is an alternate way to access the kube-apiserver instead of curling the kube-apiserver endpoint directly
+
+- If you have a service for nginx pod that of type ClusterIP, and you want to access it, you can use the kubectl proxy
+  curl http://127.0.0.1:8001/api/v1/namespaces/default/services/nginx/proxy/
+
+- Another way to access the service, is by using the kubectl port-forward utility
+  - it takes a pod, deployment, replicaset, or a service as an argument
+  - then we specify a port from our host then we specify the resource port
+  - Example: kubectl port-forward service/nginx 8000:80
+  - Finally we just call our localhost server with the target port: curl http://localhost:8000

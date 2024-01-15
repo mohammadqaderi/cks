@@ -1,0 +1,128 @@
+#Linux Capabilities
+- To check which capabilities the command needs, use the following command:
+  getcap /usr/bin/ping
+
+- To check which capabilities the process needs, use the following command:
+  - Find the pid of the process: ps -ef | grep /usr/bin/sshd | grep -v grep
+  - getpcaps 779
+
+------------------------------------------------------------------------------------------------
+#Linux Syscalls
+- To trace the syscalls used by a running process we first need to determine the process id
+- Example:
+  pidof etcd -> 3569
+  strace -p 3569 -> return all the future syscalls made by etcd.
+
+------------------------------------------------------------------------------------------------
+
+#Remove Obsolete Packages and Services
+- Lab Question:
+On the controlplane host, we have nginx service running which isn't needed on that system.
+Stop the nginx service and remove its service unit file. Make sure not to remove nginx package from the system.
+
+Solution:
+#Disable the nginx service
+systemctl list-units --all | grep -i nginx
+systemctl stop nginx.service
+#Remove the nginx service
+rm /lib/systemd/system/nginx.service
+------------------------------------------------------------------------------------------------
+
+#SSH Hardening
+
+- Disabling the root ssh:
+  - Edit the sshd config file: vi /etc/ssh/sshd_config
+  - Change the PermitRootLogin to no
+  - Reload the sshd service: systemctl reload sshd
+
+- Disabling the password authentication:
+  - Edit the sshd config file: vi /etc/ssh/sshd_config
+  - Change the PasswordAuthentication to no
+  - Reload the sshd service: systemctl reload sshd
+------------------------------------------------------------------------------------------------
+
+#Restrict Syscalls Using Seccomp
+- To check if the kernel in the host supports seccomp, check the boot configuration by looking for the keyword
+  seccomp in the boot file like this: grep -i seccomp /boot/config-$(uname -r)
+------------------------------------------------------------------------------------------------
+
+#Limit Node Access
+- Access Control Files
+  - /etc/passwd contains basic information about the users in the system (does not save any passwords)
+  - /etc/shadow contains password of the users hashed
+  - /etc/group contains stores information about all the users groups in the system
+
+- We can disable the user account by updating the default shell fo the user to a nologin shell like this:
+  usermod -s /bin/nologin michel
+
+- Example:
+Create a user named sam on the controlplane host. The user's home directory must be /opt/sam.
+Login shell must be /bin/bash and uid must be 2328. Make sam a member of the admin group.
+
+useradd sam -G admin -u 2328 -s /bin/bash -d /opt/sam
+------------------------------------------------------------------------------------------------
+
+#Restrict Kernel Modules
+- We can blacklist this module by adding it to this file: /etc/modprobe.d/blacklist.conf
+------------------------------------------------------------------------------------------------
+
+#Apparmor
+- To load AppArmor profile, use the following command:
+  apparmor_parser /etc/apparmor.d/root.add_data.sh
+
+- To disable AppArmor profile, use the following command:
+  apparmor_parser -R /etc/apparmor.d/root.add_data.sh
+- Then create the same line to the profile inside:
+  ln -s /etc/apparmor.d/root.add_data.sh /etc/apparmor.d/disable/
+------------------------------------------------------------------------------------------------
+
+#Runtime Classes In Kubernetes
+- To check the default runtime in kubernetes cluster, check this folder:
+  cd /var/run/containerd
+------------------------------------------------------------------------------------------------
+
+#OPA
+- It listens on port 8181 by default
+- Authentication and authorization are disabled by default in OPA.
+- Installation:
+  - curl -L -o opa https://github.com/open-policy-agent/opa/releases/download/v0.38.1/opa_linux_amd64
+  - chmod 755 ./opa
+  - ./opa run -s &
+- Question: Load policy /root/sample.rego to OPA with the name samplepolicy.
+Solution: Make a PUT API call to /v1/policies/
+curl -X PUT --data-binary @sample.rego http://localhost:8181/v1/policies/samplepolicy
+-------------------------------------------------------------------------------------------------
+
+#PodSecurityPolicy
+- To enable Pod Security at the namespace level, you need to add pod security labels
+ to the namespace using the following format:
+pod-security.kubernetes.io/<MODE>: <LEVEL>
+labels:
+    pod-security.kubernetes.io/enforce: baseline
+- Pod security standards:
+  - Baseline
+  - Privileged
+  - Restricted
+-------------------------------------------------------------------------------------------------
+
+#Kubesec
+- Installation
+  wget https://github.com/controlplaneio/kubesec/releases/download/v2.13.0/kubesec_linux_amd64.tar.gz
+  tar -xvf  kubesec_linux_amd64.tar.gz
+  mv kubesec /usr/bin/
+
+- Example of scanning:
+  - kubesec scan pod.yaml
+  - Or, curl -sSx POST --data-binary @"pod.yaml" https://v2.kubesec.io/scan
+  - Or, kubesec http 8080 &
+-------------------------------------------------------------------------------------------------
+
+#Trivy
+- Installation: https://aquasecurity.github.io/trivy/v0.48/getting-started/installation
+- Trivy command can take additional options to filter the results
+    - --severity=CRITICAL
+    - --severity=CRITICAL,HIGH
+    - --ignore-unfixed
+- Scanning Archive image:
+  trivy image --input archive.ta
+-------------------------------------------------------------------------------------------------

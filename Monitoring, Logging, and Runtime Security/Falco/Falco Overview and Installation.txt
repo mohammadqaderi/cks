@@ -1,0 +1,18 @@
+- Falco needs to see what system calls are coming through the applications in the user space into the Linux kernel.
+- It has to insert itself in the kernel, to set in the middle and see what's coming in.
+- Falco can interact with the kernel through EBPF (Extended Berkeley Packet Filter).
+- The system calls are then analyzed by the cystic libraries in the user space.
+- The events are then filtered by the Falco policy engine by making use of the predefined rules that can detect
+  whether the events were suspicious or not.
+- Such an event is then alerted via various output channels such as CIS log files, standard outputs, or Slack channel.
+- Installation:
+  - Install it using a falco kernel package from the official website.
+  - Install it using DaemonSet.
+
+Reference links for Falco:
+- https://falco.org/docs/getting-started/installation/
+- https://github.com/falcosecurity/charts/tree/master/falco
+- https://falco.org/docs/rules/supported-fields/
+- https://falco.org/docs/rules/default-macros/
+- https://falco.org/docs/configuration/
+

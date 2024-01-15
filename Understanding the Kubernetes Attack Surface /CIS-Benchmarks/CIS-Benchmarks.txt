@@ -1,0 +1,14 @@
+- To run a benchmark test check on ubuntu server after installing the benchmark program, run the following command:
+cd /root/Assessor
+sh ./Assessor-CLI.sh -i -rd /var/www/html/ -nts -rp index
+ - -rd stands for the report directory
+ - -i stand for proceed interactive
+ - -nts stand for no timestamp
+ - -rp stand for report prefix which is index
+
+- This will generate a report that'll be in /var/www/html/index.html
+
+- This report shows the best security practices that you should follow to secure your server
+
+- Also, it'll show the vulnerabilities exists in your server and how to fix them
+

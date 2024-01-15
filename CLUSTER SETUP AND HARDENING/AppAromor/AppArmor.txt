@@ -1,0 +1,24 @@
+- To implement fine-grain control over the processes running inside the container we've to make use of AppArmor
+
+- AppArmor is a Linux security module that used to confine a program to a limited set of resources.
+
+- To check if AppArmor is installed and running, run systemctl status apparmor
+
+- Check the following file in kubernetes node to check if apparmor is loaded:
+  - cat /sys/module/apparmor/parameters/enabled
+  - You'll see either Y or N
+
+- Just like seccomp, AppArmor is applied to an application via a profile
+  - This profile must be loaded in the kernel
+    - Check if it's loaded: cat /sys/kernel/security/apparmor/profiles
+
+- AppArmor profiles are simple text files that define what resources can be used by an application
+- These include linux capabilities, network resources, file resources, etc...
+
+- We can check the status of AppArmor using the following command:
+  aa-status
+
+- AppArmor profiles can be loaded in three different modes:
+  - enforce -> AppArmor will enforce and monitor the rules
+  - complain -> AppArmor will allow the application tasks without any restrictions, but it'll then log them as events.
+  - unconfined -> AppArmor will allow the application tasks, but AppArmor will not log any events

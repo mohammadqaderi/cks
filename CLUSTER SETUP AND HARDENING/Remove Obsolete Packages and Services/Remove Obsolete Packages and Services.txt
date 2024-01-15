@@ -1,0 +1,20 @@
+- Run systemctl list-units --type service -> to list all the services in the system
+
+- Run apt list --installed to list all the installed packages
+
+- Run apt remove PACKAGE_NAME to remove the package from the system
+
+- Read the services part in CIS Benchmark pdf to know more about pest practices to deal with system services
+
+
+- Lab Question:
+On the controlplane host, we have nginx service running which isn't needed on that system.
+Stop the nginx service and remove its service unit file. Make sure not to remove nginx package from the system.
+
+Solution:
+#Disable the nginx service
+systemctl list-units --all | grep -i nginx
+systemctl stop nginx.service
+#Remove the nginx service
+rm /lib/systemd/system/nginx.service
+

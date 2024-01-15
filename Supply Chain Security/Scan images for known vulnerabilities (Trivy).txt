@@ -1,0 +1,23 @@
+- Common Vulnerabilities and Exposures (CVE)
+  - Computer code is not perfect.
+  - If a bad guy find this bug, they use it to abuse the system.
+  - If good guy find this bug he will tell the system owners about this bug.
+  - CVE is a central place that were developers and engineers put their bugs reports and explain the bugs details.
+  - Problems or bugs considered as CVEs are of two things:
+    - Anything that allows an attacker to bypass security checks.
+    - Anything that allows an attacker to mess up your system or seriously degraded performance, interrupt services
+      and so on.
+  - Each CVE get a severity score or severity rating between (0,10)
+
+
+- Trivy (Vulnerability Scanner)
+  - Developed by Aqua Security
+  - is a simple and comprehensive vulnerability scanner for containers and other artifacts
+  - Example of scanning: trivy image nginx:1.18.0
+  - Installation: https://aquasecurity.github.io/trivy/v0.48/getting-started/installation
+  - Trivy command can take additional options to filter the results
+    - --severity=CRITICAL
+    - --severity=CRITICAL,HIGH
+    - --ignore-unfixed
+  - Scanning Archive image:
+    trivy image --input archive.tar

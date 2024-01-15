@@ -1,0 +1,38 @@
+- Admission Controllers
+ -> is a component responsible for intercepting and validating requests to the Kubernetes API server
+  before they are persisted or executed.
+ -> It acts as a gatekeeper, enforcing custom admission policies and ensuring that
+  incoming requests meet certain criteria or conform to specific rules.
+ -> They can validate and mutate incoming requests, ensuring that resources created or modified adhere
+  to specific requirements, such as security policies, resource quotas, naming conventions,
+  or custom business rules.
+ -> There are two types of Admission Controllers in Kubernetes:
+   - Validating Admission Controllers
+     -> validate incoming requests and determine whether they should be allowed or rejected.
+     -> They can examine the object being created or modified and make decisions based on certain criteria.
+     -> If a request is deemed invalid, it is rejected, and an error message is returned to the client.
+     -> Built-in validation admission controllers:
+       - NamespaceLifecycle: Ensures that namespaces are created or modified following specific lifecycle
+         rules.
+       - quota: Enforces resource usage limits and prevents resource exhaustion.
+       - PodSecurityPolicy: Validates the security context of pods and enforces security policies.
+       - DefaultStorageClass: Ensures that the default storage class is properly set.
+
+   - Mutating Admission Controllers
+     -> have the ability to modify incoming requests before they are persisted or executed.
+     -> They can mutate the object being created or modified to enforce defaults, inject additional configurations,
+      or apply transformations.
+     -> Built-in mutating admission controllers
+       - NamespaceAutoProvisioning: Automatically creates a namespace if it doesn't exist.
+       - LimitRanger: Sets default resource limits on pods if not specified explicitly.
+       - PodPreset: Injects additional configurations or environment variables into pods.
+       - ServiceAccount: Automatically assigns a service account to a pod if not specified.
+
+
+- The NamespaceLifecycle admission controller will make sure that requests
+  to a non-existent namespace is rejected and that the default namespaces such as
+  default, kube-system and kube-public cannot be deleted.
+
+- Note: Since the kube-apiserver is running as pod you can check the process to see enabled and disabled plugins
+  using the following command:
+  ps -ef | grep kube-apiserver | grep admission-plugins

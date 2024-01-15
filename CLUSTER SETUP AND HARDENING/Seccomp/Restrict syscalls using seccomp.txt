@@ -1,0 +1,42 @@
+- By default, the Linux kernel allow any syscall to be invoked by the programs running inside the user space.
+  which can increase the attack surface.
+
+- This is where we can use Seccomp.
+- Seccomp stands for (Secure Computing) and it's a linux kernel level feature that can be used to sandbox applications
+  to only use the syscalls they need.
+
+- To check if the kernel in the host supports seccomp, check the boot configuration by looking for the keyword
+  seccomp in the boot file like this: grep -i seccomp /boot/config-$(uname -r)
+  - if you see in the output CONFIG_SECCOMP=y that means that seccomp is supported by the kernel
+
+- This profile has the default action of SCMP_ACT_ERRNO that blocks all syscalls by default.
+  The syscalls to be allowed are part of the whitelist. This is an example of a whitelist type profile.
+
+
+- Let's run a container like this: docker run -it --rm docker/whalesay /bin/sh
+  - Let's try to change the date: date -s '19 APR 2016 22:00:00' -> Permission is denied
+  - Check the process id: ps -ef
+  - Inspect the status of the process id and look for seccomp field: grep Seccomp /proc/1/status
+  - If the field Seccomp value is 2, then that means that Seccomp is implemented on the container.
+
+- Seccomp can operate with three modes:
+  - Mode 0
+    - Seccomp is disabled
+  - Mode 1
+    - Seccomp is applied in a strict mode
+    - That will block all SYSCALLS except four calls (read, write, exit, cigarette)
+  - Mode 2
+    - Seccomp is enabled and filter the syscalls
+
+- Docker has a built-in seccomp filter that it uses by default whenever we create a container
+- The filter Seccomp restricts about 60 of the 300 plus syscalls in linux
+
+- There are two profile for seccomp written in json format:
+  - whitelist.json
+  - blacklist.json
+- We can create our custom seccomp filter and provide it in the docker host (custom.json)
+  - Create the docker container by use of the seccomp custom filter:
+    docker run -it --rm --security-opt seccomp=/opt/custom.json docker/whalesay /bin/sh
+
+- To disable the seccomp while running a container and use all the available syscalls run the following command:
+  docker run -it --rm --security-opt seccomp=unconfined docker/whalesay /bin/sh

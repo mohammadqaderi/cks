@@ -1,0 +1,17 @@
+- kubesec help analyse a given resource definition file and returns its score along with details about
+  the critical issues that were found on it.
+
+- It's rightly detected the issues with a privileged container.
+
+- It also gives a reason why this particular issue is critical
+
+- Installation:
+wget https://github.com/controlplaneio/kubesec/releases/download/v2.13.0/kubesec_linux_amd64.tar.gz
+tar -xvf  kubesec_linux_amd64.tar.gz
+mv kubesec /usr/bin/
+
+- Example of scanning:
+  - kubesec scan pod.yaml
+  - Or, curl -sSx POST --data-binary @"pod.yaml" https://v2.kubesec.io/scan
+  - Or, kubesec http 8080 &
+

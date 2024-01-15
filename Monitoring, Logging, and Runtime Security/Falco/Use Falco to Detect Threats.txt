@@ -1,0 +1,65 @@
+- Check if falco is running:
+  - systemctl status falco
+  - Run a pod: kubectl run nginx --image nginx
+  - Use Journalctl to check the falco logs: journalctl -uf falco
+
+- Each event inside a pod for example, will be fired in falco events, like these ones:
+  - kubectl exec -it nginx -- shell
+  - cat /etc/shadow
+
+- Falco rules are presented in rules.yaml file.
+- Falco rules.yaml file contains the following:
+  - rules element (array of rules):
+    - rule element: a unique name for the rule
+    - description: a description for the rule of what the rule does.
+    - condition: a filtering expression that is applied against events to match the rule.
+    - output: output to be generated for the event
+    - priority: severity for the rule event
+
+- Example of creating a custom rule:
+rules:
+- rule: Detect shell inside a container
+  description: Alert if the shell such as bash is open inside a container
+  condition: container.id != host and proc.name = bash
+  output: Bash Shell Opened (user=%user.name %container.id)
+  priority: WARNING
+
+- container.id and proc.name are Sysdig filters that are used by falco
+- The falco policy engine use of these filters to extract information about the event.
+- Other filters used by falco such as:
+  - fd.name: name of the file descriptor
+    - used to match events against a specific file such as reading/writing inside a file.
+  - evt.type: used to filter system calls by the name such as execve,open,accept etc...
+  - user.name: filter the user whose actions generated the event
+  - container.image.repository: filters the specific images by name
+
+- The priority can handle different values:
+  - DEBUG (Lowest severity)
+  - ERROR
+  - WARNING
+  - NOTICE
+  - INFORMATIONAL
+  - ALERT
+  - CRITICAL
+  - EMERGENCY (highest severity)
+
+- For the above example, instead of creating a rule for each shell, we can create element for all shells and provide
+  it in the condition:
+  - rule: Detect shell inside a container
+    description: Alert if the shell such as bash is open inside a container
+    condition: container.id != host and proc.name in (linux_shells)
+    output: Bash Shell Opened (user=%user.name %container.id)
+    priority: WARNING
+  - list: linux_shells
+    items: [bash, sh, zsh, csh, ksh]
+
+- We can use macro (Simplified condition syntax) in the rule above
+  - rule: Detect shell inside a container
+    description: Alert if the shell such as bash is open inside a container
+    condition: container and proc.name in (linux_shells)
+    output: Bash Shell Opened (user=%user.name %container.id)
+    priority: WARNING
+  - list: linux_shells
+    items: [bash, sh, zsh, csh, ksh]
+  - macro: container
+    condition: container.id != host

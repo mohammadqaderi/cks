@@ -1,0 +1,18 @@
+- To generate a Key Pair in the client run the following command:
+  ssh-keygen -t rsa
+
+- Copy the public key from ~/.ssh/rsa.pub to the remote server
+  ssh-copy-id HOSTNAME
+
+- The copied public key will be in the remote server under ~/.ssh/authorized_keys
+
+- Disabling the root ssh:
+  - Edit the sshd config file: vi /etc/ssh/sshd_config
+  - Change the PermitRootLogin to no
+  - Reload the sshd service: systemctl reload sshd
+
+- Disabling the password authentication:
+  - Edit the sshd config file: vi /etc/ssh/sshd_config
+  - Change the PasswordAuthentication to no
+  - Reload the sshd service: systemctl reload sshd
+

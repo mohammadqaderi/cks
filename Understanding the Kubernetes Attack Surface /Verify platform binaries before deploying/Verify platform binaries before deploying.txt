@@ -1,0 +1,42 @@
+- We generate SHA hash to check if the kubernetes binaries are safe
+
+- We first download the kubernetes binaries
+  wget -O /opt/kubernetes.tar.gz https://dl.k8s.io/v1.27.0/kubernetes.tar.gz
+
+- Then, we use the shasum utility to verify the kubernetes binaries checksum
+  macOS: shasum -a 512 kubernetes.tar.gz
+  Linux: sha512sum kubernetes.tar.gz
+
+- Finally, we use the shasum utility to compare the hash between the kubernetes binaries and the downloaded
+binaries
+
+shasum -a 512 kubernetes.tar.gz
+shasum -a512 /opt/downloads/kubernetes3.tar.gz
+
+
+----------------------------------------------------------------
+Question: lets see how shasum changes if we decompress and compress the same package with some modification.
+ - Decompress the /opt/kubernetes.tar.gz in the same directory and modify file named version with
+   some random message and then compress the directory back with name /opt/kubernetes-modified.tar.gz.
+ - Now compare shasum of a new file with the original.
+
+Solution:
+
+cd /opt/
+tar -xf kubernetes.tar.gz
+cd kubernetes
+echo "v1.27.0-modified" > version
+cd ..
+tar -czf kubernetes-modified.tar.gz kubernetes
+shasum -a512 kubernetes-modified.tar.gz
+
+-------------------------------------------------------------------
+
+Reference links
+Below are some references:
+
+https://kubernetes.io/docs/setup/release/notes
+
+# They moved release notes to their own Kubernetes GitHub repository.
+
+https://github.com/kubernetes/kubernetes/tree/master/CHANGELOG

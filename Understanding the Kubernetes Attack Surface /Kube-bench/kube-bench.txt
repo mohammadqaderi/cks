@@ -1,0 +1,7 @@
+- Installing Steps:
+
+- curl -L https://github.com/aquasecurity/kube-bench/releases/download/v0.6.11/kube-bench_0.6.11_linux_amd64.tar.gz -o /opt/kube-bench.tar.gz
+- tar -xvf kube-bench.tar.gz -C /opt/kube-bench
+- ./kube-bench --config-dir `pwd`/cfg --config `pwd`/cfg/config.yaml
+
+

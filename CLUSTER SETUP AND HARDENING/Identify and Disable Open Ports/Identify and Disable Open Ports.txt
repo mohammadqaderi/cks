@@ -1,0 +1,22 @@
+- To check if a port is used and listening for connection requests, use the following command:
+  netstat -an | grep -w LISTEN
+
+- Always check the open ports when installing a new package or software from the official docs from that package/software.
+
+- If you want to look at what port 53 is used for, you can check the services file by this:
+  cat /etc/services | grep -w 53
+
+
+- Lab Question:
+We have a service running on controlplane host which is listening on port 9090.
+Identify the service and stop the same to free the 9090 port.
+
+#Solution
+nestat -natp | grep -w 9090 -> return the package name
+systemctl remove PACKAGE_NAME
+
+
+- References:
+https://access.redhat.com/security/cve/cve-2019-3874
+
+https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#check-required-ports

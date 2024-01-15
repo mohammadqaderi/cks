@@ -1,0 +1,13 @@
+- To list all the modules loaded into the kernel, run lsmod command
+
+- Blacklisting in the context of the kernel modules is a mechanism to prevent the kernel module from loading.
+  Example: The SCTP kernel module is not commonly used with kubernetes cluster.
+  - We can blacklist this module by adding it to this file: /etc/modprobe.d/blacklist.conf
+  - Once this step is complete, reboot the nodes: shutdown -r now
+
+- Another module that should not be enabled in the kubernetes cluster is the DCCP kernel module
+  - Stands for (Datagram congestion control protocol)
+  - Add it to this file: /etc/modprobe.d/blacklist.conf
+  - Reboot the nodes: shutdown -r now
+
+- Refer the 3.4 section (Uncommon Network Protocols) in the CIS benchmark pdf book for more information

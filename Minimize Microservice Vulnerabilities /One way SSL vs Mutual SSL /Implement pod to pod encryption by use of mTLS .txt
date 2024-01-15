@@ -1,0 +1,11 @@
+- Third-party programs like Istio and Linkerd (Service Mesh) are facilitate mTLS encryption between pods
+
+- They allow secure service-to-service communication without depending on the applications
+
+- Istio inserts a sidecar container to all the pods.
+
+- The Istio sidecar container intercepts the messages between the pods before it leaves the network
+- It then encrypts the message and send through the network.
+- Once the encrypted message received by the other pod, it'll be decrypted by the sidecar container in that pod.
+- If we've an external service reaching on of the pods inside the cluster, it's not implementing mTLS encryption
+  as Istio do in the cluster, for that the messages are sent in a plain text to that service

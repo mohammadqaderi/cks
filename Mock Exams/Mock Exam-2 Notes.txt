@@ -1,0 +1,34 @@
+Question-3
+- To prevent service account token secret is not mounted in the pod at the
+  location /var/run/secrets/kubernetes.io/serviceaccount we've to use the following property under the pod spec:
+  automountServiceAccountToken: false
+- Also, delete the volume mount that's related to the default service account in the pod definition.
+
+------------------------------------------------------------------------------------------------
+
+Question-4
+- Regarding the output in the falco rule, you can use the following resources to edit the output:
+ - https://falco.org/docs/reference/rules/supported-fields/
+------------------------------------------------------------------------------------------------
+
+Question-6
+On the controlplane node, an unknown process is bound to the port 8088. Identify the process and prevent it
+from running again by stopping and disabling any associated services.
+Finally, remove the package that was responsible for starting this process.
+
+- Check the process which is bound to port 8088 on this node using netstat:
+  netstat -ptln | grep 8088
+
+- Check if any service is running with the same name:
+  systemctl list-units  -t service --state active | grep -i PROCESS_NAME
+
+- Stop the service and disable it
+  systemctl stop SERVICE
+  systemctl disable SERVICE
+
+- Check for the package by the same name:
+  apt list --installed | grep PROCESS_NAME
+
+- Uninstall the package
+  apt remove PACKAGE_NAME -y
+------------------------------------------------------------------------------------------------

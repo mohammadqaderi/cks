@@ -1,0 +1,79 @@
+- Auditing/Audit-log
+  - The webapp color application is changing simultaneously because there's a role that allows changing the
+    following resources:
+    - pods
+    - configmaps
+- For that, let's create the following audit-policy:
+vi /etc/kubernetes/audit-policy.yaml
+apiVersion: audit.k8s.io/v1
+kind: Policy
+omitStages:             # Omit RequestReceived
+  - RequestReceived
+rules:
+  - level: Metadata     # New rule at Metadata level
+    resources:          # for pods and configmaps
+    - group: ""
+      resources:
+      - pods
+      - configmaps
+    namespaces:         # in all three namespaces
+    - omega
+    - citadel
+    - eden-prime
+- Mount the policy in api-server
+  - Create the directory for the audit log first, or api-server will fail to come up:
+    mkdir -p /var/log/kubernetes/audit and Add the required arguments to enable auditing:
+        - --audit-log-path=/var/log/kubernetes/audit/audit.log
+        - --audit-policy-file=/etc/kubernetes/audit-policy.yaml
+  - Add volumes (to any existing volumes) for the audit policy and log
+     volumes:
+     - name: audit-log
+       hostPath:
+         path: /var/log/kubernetes/audit/
+         type: DirectoryOrCreate
+     - name: audit
+       hostPath:
+         path: /etc/kubernetes/audit-policy.yaml
+         type: File  # <- satifies requirement "will mount only the file"
+  - Add volumeMounts (to any existing ones) for these volumes
+       volumeMounts:
+        - name: audit-log
+          mountPath: var/log/kubernetes/audit/
+          readOnly: false
+        - name: audit
+          mountPath: /etc/kubernetes/audit-policy.yaml
+          readOnly: true      # <- The file should be immutable
+------------------------------------------------------------------------------------------------
+
+- Falco Installation
+# Set up the apt repo for Falco
+curl -s https://falco.org/repo/falcosecurity-3672BA8F.asc | apt-key add -
+echo "deb https://download.falco.org/packages/deb stable main" | tee -a /etc/apt/sources.list.d/falcosecurity.list
+
+# Update apt indexes
+apt-get update -y
+
+# Install prerequiste and falco
+apt-get -y install linux-headers-$(uname -r) falco
+
+# Not strictly necessary to start it now, but if you want a green icon
+# at this stage, you will need to start it.
+systemctl start falco
+------------------------------------------------------------------------------------------------
+
+- Security Report
+- Inspect the API server audit logs and identify the user responsible for the abnormal behaviour seen
+  in the citadel namespace. Save the name of the user, role and rolebinding responsible for the event
+  to the file /opt/blacklist_users file (comma separated and in this specific order).
+  - Inspect audit logs.
+    cat /var/log/kubernetes/audit/audit.log | grep citadel | jq 'select (.verb == "delete")'
+    echo 'agent-smith,important_role_do_not_delete,important_binding_do_not_delete' > /opt/blacklist_users
+
+  - Inspect the falco logs and identify the pod that has events generated because of packages being updated on it.
+    Save the namespace and the pod name in the file /opt/compromised_pods
+    (comma separated - namespace followed by the pod name)
+    journalctl -fu falco
+    find the pod based on the container name information
+    echo 'eden-prime,eden-software2' > /opt/compromised_pods
+------------------------------------------------------------------------------------------------
+

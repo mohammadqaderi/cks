@@ -1,0 +1,42 @@
+- Anyone with access to the Docker Daemon can delete existing containers hosting applications
+
+- Also, he can delete volumes that storing data
+
+- Can run his own containers to run their applications (risky applications)
+
+- Can gain root access to the host system by running a privileged container
+
+- Can target the other systems in the network and the network itself.
+
+- Docker daemon is running on Unix socket
+
+- Security Levels
+  - Securing The docker host itself from unwanted access
+    - Disable Password based authentication
+    - Enable SSH key based authentication
+    - Determine users who need access to the server
+  - For this, we add hosts option in the /etc/docker/daemon.json file
+  - Make sure to expose the docker daemon on a private network interface in your infrastructure
+  - Create TLS certificates for the docker daemon
+    - server.pem
+    - serverkey.pem
+    - add the certificates paths in the /etc/docker/daemon.json file in the following properties:
+      - tlscert
+      - tlskey
+    - set the tls option to true in the /etc/docker/daemon.json file
+  - Change the host port from 2375 to 2376
+    - 2375 for unencrypted connection
+    - 2376 for encrypted connection
+  - Anyone outside the docker daemon environment can access the docker daemon with the following:
+    - Export the docker host: expose DOCKER_HOST="tcp://192.168.1.10:2376"
+    - Export TLS flag: expose DOCKER_TLS=true
+    - docker ps
+  - All of this is not enough yet, because anyone can set the TLS flag to true and access the docker daemon
+  - For that, we've to enable the certificate-based authentication
+    - Copy the certificate Authority file (cacert.pem) to the docker daemon server
+    - add the following properties to the /etc/docker/daemon.json file:
+      - tlsverify: true
+      - tlscacert: /var/docker/caserver.pem
+    - To connect to the docker daemon now, the user must have a client.pem, clientkey.pem, cacert.pem files
+    - Set the DOCKER_TLS_VERIFY=true
+    - docker --tlscert=<path_to_tlscert> --tlskey=<path_to_tlskey> --tlscacert=<path_to_tlscacert>
