@@ -11,4 +11,3 @@ sh ./Assessor-CLI.sh -i -rd /var/www/html/ -nts -rp index
 - This report shows the best security practices that you should follow to secure your server
 
 - Also, it'll show the vulnerabilities exists in your server and how to fix them
-

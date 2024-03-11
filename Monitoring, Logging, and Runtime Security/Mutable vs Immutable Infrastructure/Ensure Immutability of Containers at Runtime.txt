@@ -7,7 +7,6 @@
   - To fix this, you can add a volumes property to make allow the container to write data to a specific locations.
 
 - As a note stick to these best practices:
-  - do not use readOnlyRootFilesystem
   - do not use privileged
   - do not user runAsUser: 0 (and use different user id)
 
